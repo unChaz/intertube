@@ -1,0 +1,101 @@
+timestamp: 2013-02-23T17:18:27.766000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+success!
+timestamp: 2013-02-23T17:18:27.904000
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2013-02-23T17:18:28.053000
+CREATE TABLE auth_membership(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2013-02-23T17:18:28.209000
+CREATE TABLE auth_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE,
+    name CHAR(512),
+    table_name CHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2013-02-23T17:18:28.362000
+CREATE TABLE auth_event(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time_stamp TIMESTAMP,
+    client_ip CHAR(512),
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    origin CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2013-02-23T17:18:28.486000
+CREATE TABLE auth_cas(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    service CHAR(512),
+    ticket CHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2013-02-23T17:18:28.628000
+CREATE TABLE user_channels(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    channel_title CHAR(512)
+);
+success!
+timestamp: 2013-02-23T17:18:28.739000
+CREATE TABLE tags(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel CHAR(512),
+    owner_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    tag_name CHAR(512),
+    tag_value INTEGER
+);
+success!
+timestamp: 2013-02-23T17:18:29.403000
+CREATE TABLE plugin_comments_comment(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tablename CHAR(512),
+    record_id INTEGER,
+    parent_node INTEGER,
+    body CHAR(512),
+    deleted CHAR(1),
+    votes INTEGER,
+    created_by INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on TIMESTAMP
+);
+success!
+timestamp: 2013-02-23T17:18:29.608000
+CREATE TABLE plugin_rating_master(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tablename CHAR(512),
+    record_id INTEGER,
+    rating DOUBLE,
+    counter INTEGER
+);
+success!
+timestamp: 2013-02-23T17:18:29.803000
+CREATE TABLE plugin_rating_aux(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    master INTEGER REFERENCES plugin_rating_master (id) ON DELETE CASCADE,
+    rating DOUBLE,
+    created_by INTEGER REFERENCES auth_user (id) ON DELETE CASCADE
+);
+success!

@@ -1,0 +1,35 @@
+$( document ).ready( function(){
+  var player;
+  buildPopover();
+});
+
+function buildPopover(){
+    var options = {
+    animation:true, 
+    placement: 'right', 
+    trigger: 'hover', 
+    delay: { show: 50, hide: 500 },
+    container: '#the-player'
+  }
+  $('#player-hover').popover(options);
+}
+
+function onYouTubePlayerReady(theArray) {
+  	player = document.getElementById("the-player");
+  	player.cuePlaylist(['Xx9zQeu_Xao', '4N0cwNxaiAY', 'MQgLLaHZLOE']);
+  	player.addEventListener("onStateChange", "onPlayerStateChange");
+  	 
+  	
+  	//player.cuePlaylist(playlist: theArray, index:0); 
+  	
+  	//I believe that it is noteworthy to add that the above method
+  	//also accepts suggestedQuality:String which may be something
+  	//that we can use later.
+}
+
+function onPlayerStateChange(event) {
+  	if (event == "0") {
+    	alert("Video Ended");
+    	//player.nextVideo();
+  	}
+}

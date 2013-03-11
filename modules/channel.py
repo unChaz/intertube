@@ -1,0 +1,141 @@
+import operator
+from collections import deque
+from youtubeConnector import *
+import random
+
+from userData import *
+
+class Channel(object):
+	def __init__(self, user, channelName):
+		self.user_id = user
+		self.user = UserData(user)
+		self.channelName = channelName
+		self.tags = dict()
+		self.sortedTags = sorted(self.tags.iteritems(), key=operator.itemgetter(1))
+		self.sortedTags.reverse()
+		"""Keeps track of the last 50 videos played. Only saved in session"""
+		self.history = deque(maxlen=1000)
+		self.queue = deque()
+		self.nowPlaying = None
+
+	def initialize(self):
+		if len(self.tags) == 0:
+			self.setTags({self.channelName: 10})
+		videos = self.getVideos()
+		for video in videos:
+			self.queue.append(video)
+
+	def setTags(self, tags):
+		"""TODO"""
+		"""sets tags if the channel existed in the db"""
+		"""tags is a dict of tag:value pairs"""
+		self.tags = tags
+		self.sortedTags = sorted(self.tags.iteritems(), key=operator.itemgetter(1))
+		self.sortedTags.reverse()
+		self.user.updateTags(self.channelName, self.tags)
+
+	def updateTagList(self, value):
+		"""TODO"""
+		"""List of tags"""
+		for tag in self.nowPlaying.getTags():
+			self.updateTag(tag,value)
+		self.sortedTags = sorted(self.tags.iteritems(), key=operator.itemgetter(1))
+		self.sortedTags.reverse()
+		self.user.updateTags(self.channelName, self.tags)
+
+	def updateTag(self, tag, value):
+		"""If the tag is not found, add new tag.
+		Pass 1 if the video with the tag was liked.
+		Pass -1 if the video with the tag was not liked.
+		Pass 0 if neither was selected."""
+		if self.tagExists(tag):
+			self.tags[tag] += value
+		else:
+			self.addTag(tag, value)
+
+	def tagExists(self, tag):
+		if tag in self.tags:
+			return True
+		return False
+
+	def addTag(self, tag, value):
+		self.tags[tag] = value
+
+	def update(self):
+		self.user.updateTags(self)
+
+	def getVideo(self):
+		if not self.queue:
+			videos = self.getVideos()
+			for video in videos:
+				self.queue.append(video)
+
+		video = self.queue.popleft()
+		self.history.append(video.id)
+		self.nowPlaying = video
+		
+		return video
+
+	def getVideos(self):
+		search_terms = self.generateSearchTerms()
+		results = self.generateSearchResults(search_terms)
+		videos = self.chooseBestResults(results)
+		return videos
+
+	def generateSearchTerms(self):
+		"""Gets 10 random tags"""
+		tagCombos = []
+		for i in range(min(10,len(self.sortedTags))):
+			combo = self.getRandomCombo(self.sortedTags[i])
+			if combo not in tagCombos:
+				tagCombos.append(combo)
+		return tagCombos
+
+	def generateSearchResults(self, search_term_list):
+		results = []
+		for search_term in search_term_list:
+			results = results + self.search(search_term)
+		return results
+
+	def search(self, terms):
+		ytc = YouTubeConnector()
+		list = ytc.searchByKeyword(terms)
+		return list
+
+	def getRandomCombo(self, root):
+		"""Builds a random tag using the top 10 tags as root words"""
+		combo = root[0]
+		for i in range(random.randint(0,4)):
+			newTag = self.sortedTags[random.randint(0, len(self.sortedTags)-1)][0]
+			if self.tags[newTag] > 0 and not newTag in combo:
+				combo = combo + " " + newTag
+		return combo
+
+	def chooseBestResults(self, results):
+		'''Organizes results based on their tag values and returns the top 5 results'''
+		evaluatedResults = dict()
+		for result in results:
+			value = 0
+			for tag in self.sortedTags:
+				if tag[0] in result.title:
+					value += tag[1]
+			evaluatedResults[result] = value
+		sortedResults = sorted(evaluatedResults.iteritems(), key=operator.itemgetter(1))
+		sortedResults.reverse()
+		for video in sortedResults:
+			if video[0].id in self.history:
+				sortedResults.remove(video)
+			else:
+				if video[0].id in self.queue:
+					sortedResults.remove(video)
+		bestVideosTuple = sortedResults[0:min(10,len(sortedResults))]
+		bestVideos = []
+		for video in bestVideosTuple:
+			bestVideos.append(video[0])
+		return bestVideos
+
+	def videoLiked(self):
+		self.updateTagList(1)
+
+	def videoDisliked(self):
+		self.updateTagList(-1)

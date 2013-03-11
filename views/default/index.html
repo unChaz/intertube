@@ -1,0 +1,126 @@
+{{extend 'layout.html'}}
+<!--JavaScript with embedded Python.-->
+<script>
+	function onPlayerStateChange(event) {
+	  if (event == 0){
+		playNext();
+	  }
+	}
+	
+	function videoLiked(){
+	  $('#like-button').addClass('orange-border');
+    var response = $.ajax({
+      type: "GET",
+      url: "{{=URL('videoLiked')}}",
+      async: false
+    }).responseText;
+	}
+
+	function videoDisliked(){
+    loadingState();
+    var response = $.ajax({
+      type: "GET",
+      url: "{{=URL('videoDisliked')}}",
+      async: false
+    }).responseText;
+	  window.location.href=window.location.href;
+	}
+
+  function loadingState(){
+    $('#player-container').html("");
+  }
+</script>
+
+
+
+<!-- Navbar  -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="flash">{{=response.flash or ''}}</div>
+    <div class="navbar-inner">
+        <div class="title"><h4>
+        	{{=response.title or request.application}} beta</h4>	
+        </div>
+        <div class="video-title">
+          {{if session.channel:}}
+            {{=session.channel.channelName.title() + " TV"}}
+          {{pass}}
+        </div>
+        <!-- the next tag is necessary for bootstrap menus, do not remove -->
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div>
+            <ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
+            <div class="nav-collapse">
+                {{is_mobile=request.user_agent().is_mobile}}
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    {{if auth.is_logged_in():}}
+    <div class="channel-btn">
+        <div class='btn-group'>
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-film"></i>
+            Channels
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#newChannelModal" data-toggle="modal">Create a New Channel</a></li>
+            <li class="divider"\>
+              {{if auth.is_logged_in():}}
+                {{for channel in channels:}}
+                <li><a href="index.html?suggest=True&channel={{=channel}}">{{=channel}}</a></li>
+                  {{pass}}
+                {{pass}}
+          </ul>
+        </div>
+    </div>
+
+    {{pass}}
+
+    {{if session.channel:}}
+    <div>
+      <div class='control-box'>
+        <button id='dislike-button'class="btn-round btn-primary" onClick="videoDisliked()"><i class="icon-thumbs-down icon-white"></i></button>
+        <button id='like-button' class="btn-round btn-primary" onClick="videoLiked()"><i class="icon-thumbs-up icon-white"></i></button>
+        <button id='next-button' class="btn-round btn-primary" onClick="playNext()"><i class="icon-forward icon-white"></i></button>
+      </div>  
+    </div>
+    {{pass}}
+
+  </div><!--/top navbar -->
+
+<div class='loading-wrapper'><img class='loading-gif' src="{{=URL('static','images/loading.gif')}}"></img></div>
+<!-- Player Container -->
+<div class='player-container' id='player-container'>
+
+  <!-- 
+    CODE EXAMPLES TO MANUPULATE THE JS PLAYER:
+    https://developers.google.com/youtube/js_api_reference#Examples
+  -->
+      {{if session.channel:}}
+      {{video = session.channel.getVideo()}}
+      <script>
+        var params = { allowScriptAccess: "always" };
+        var atts = { id: "the-player" };
+        swfobject.embedSWF("http://www.youtube.com/v/{{=video.id}}?enablejsapi=1&playerapiid=ytplayer&version=3",
+                             "the-player", "853", "505", "8", null, null, params, atts);
+      </script>
+      <div id="the-player"></div>
+      {{else:}}
+      <div class="well welcome-div">
+        <center><h1>Welcome to InterTube</h1></center>
+        <center><h2 class='lead'>The YouTube Genome Project</h2></center>
+        <center><button class='btn btn-primary' href="#newChannelModal" data-toggle="modal">Create a Channel</button></center>
+      </div>
+      {{pass}}
+</div>
+
+<!-- Channel and Preferences Modal ================================================== --> 
+<div id="newChannelModal" class="modal hide fade new-channel-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    {{=LOAD('default', 'createChannel', ajax=True)}}
+  </div>
+</div>

@@ -1,0 +1,134 @@
+body {
+	background-color: #00334C;
+	color:white;
+}
+
+.page-header {
+	color: white;
+}
+
+.button-container{
+	margin-left:auto;
+	margin-right:auto;
+	width:853px;		
+}
+
+.video-title{
+	margin-left:auto;
+	margin-right:auto;
+	color: white;
+	width: 853px;
+	text-align: center;
+	padding-top: 10px;
+	padding-bottom: 0px;
+	margin-bottom: -20px;
+	height:20px;
+}
+
+.player-container {
+	position:relative;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:90px;
+	height:505px;
+	width:853px;
+	color:black;
+}
+
+.channel-btn {
+	float:left;
+	padding:20px;
+}
+
+.channel-btn .btn {
+	width:200px;
+}
+
+.title {
+	float:left;
+	padding-left:20px;
+	color:white;
+}
+
+.channel-title {
+	color:white;
+}
+
+.control-box {
+	width:220px;
+	height: 70px;
+	-moz-border-radius: 70px;
+	border-radius: 70px;
+	margin:auto;
+	margin-top: 20px;
+	padding-top:10px;
+	padding-left:10px;
+}
+
+.btn-round {
+	width:50px;
+	height:50px;
+	-moz-border-radius: 50px;
+	border-radius: 50px;
+	margin:10px;
+	float: left;
+}
+
+.title-center {
+	width:100%;
+	margin:auto;
+	text-align:center;
+	color:white;
+	padding-top: 0px;
+	padding-bottom:15px;
+}
+
+.new-channel-modal {
+	width:450px;
+	height:60px;
+	margin-top:200px;
+}
+
+.new-channel-form {
+	width:500px;
+	padding-left:100px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top:50px;
+}
+
+.navbar .nav {
+	margin-top:-10px;
+}
+
+.popover {
+	left: 1390px !important;
+	top: 165px !important;
+}
+
+.orange-border {
+	border: 3px orange solid;
+}
+
+.welcome-div {
+	height:200px;
+	width:600px;
+	margin:auto;
+	padding-top:80px;
+}
+
+.loading-gif {
+	position:relative;
+	margin:-50px;
+	width:100px;
+	height:100px;
+}
+
+.loading-wrapper {
+	position:absolute;
+	width:100px;
+	height:100px;
+	left:50%;
+	top:400px;
+	overflow:visible;
+}

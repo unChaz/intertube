@@ -1,0 +1,69 @@
+import gdata.youtube
+import gdata.youtube.service
+import atom
+
+from gluon import current
+current.db = db
+current.gdata = gdata
+
+from userData import *
+from video import *
+from youtubeConnector import *
+from channel import *
+
+# -*- coding: utf-8 -*-
+### required - do no delete
+def user(): return dict(form=auth())
+def download(): return response.download(request,db)
+def call(): return service()
+### end requires
+
+
+def index():
+	if bool(request.vars.suggest) == True:
+            value = request.vars.channel
+            session.channel = Channel(auth.user.id, request.vars.channel)
+            user = UserData(auth.user.id)
+            session.channel.setTags(user.getTags(request.vars.channel))
+	channels = None
+	if auth.is_logged_in():
+            userList = UserData(auth.user.id)
+            channels = userList.getChannels()
+	'''session.channel = Channel('User', 'Starcraft 2')
+	session.channel.setTags({
+                'starcraft': 8,
+                'gameplay': 8,
+                'hots': 6,
+                'protoss': 6,
+                'build': 4,
+                'beta': 3
+                })'''
+	return dict(channels=channels)
+
+def error():
+    return dict()
+
+def createChannel():
+    form = FORM(INPUT(_name='channel_name', requires=IS_NOT_EMPTY(), _placeholder="Enter a title or keyword to make a new channel", _class="input-medium search-query"),
+              INPUT(_type='submit', _value="Create", _class="btn btn-primary create-btn"))
+    form.element('form')['_onsubmit']="$('#newChannelModal').modal('hide');loadingState();"
+    if form.process().accepted:		
+        if auth.is_logged_in():
+            session.channel = Channel(auth.user.id, form.vars.channel_name)
+            session.channel.setTags({form.vars.channel_name: 100})
+            userList = UserData(auth.user.id)
+            userList.createChannel(form.vars.channel_name)
+        else:
+            session.channel = Channel(0, form.vars.channel_name)
+            session.channel.setTags({form.vars.channel_name: 100})
+        redirect('index.html', client_side=True)
+    return dict(form=form)
+	
+def videoLiked():
+	session.channel.videoLiked()
+	return True
+
+
+def videoDisliked():
+	session.channel.videoDisliked()
+	return True
