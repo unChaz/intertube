@@ -41,9 +41,7 @@ Demo
 
 [Here](http://gdata.youtube.com/demo/index.html) is a demo that allows you to play with the YouTube API to get familiar with it.
 
-Our developer key is:
-
->AI39si5mIClz6YRx724Qalfj1qOT2b28Rkok_ZT2JBSUeArg0Gx3Kl5tcPFlF__ywVF1lKbzl3T9O5OkFFdQlbKETnTO8dpzQg
+You'll need to create a developer key with google api.
 
 Contact
 -------
