@@ -1,7 +1,7 @@
 InterTube
 =========
 
-The "YouTube Genome Project" (kinda like pandora), Intertube is a web2py application that allows users to create channels of youtube videos using keywords, and voting to improve the quality of the channel.
+The "YouTube Genome Project" (kinda like pandora), Intertube is a python web application that allows users to create channels of youtube videos using keywords, and voting to improve the quality of the channel.
 
 Resources
 ---------
